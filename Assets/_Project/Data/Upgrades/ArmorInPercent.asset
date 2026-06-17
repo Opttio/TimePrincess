@@ -15,5 +15,6 @@ MonoBehaviour:
   upgradeName: Armor in percent
   description: Upgrade your armor at a specified percentage
   icon: {fileID: 0}
-  type: 6
+  rewardType: 0
+  type: 8
   value: 8

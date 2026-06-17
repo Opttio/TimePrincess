@@ -4,15 +4,21 @@ namespace _Project.Scripts.ScriptableObjects
 {
     public enum UpgradeType
     {
-        FirstSkillInPercent,
-        FirstSkillInTerms,
-        SecondSkillInPercent,
-        SecondSkillInTerms,
+        FirstSkillDamageInPercent,
+        FirstSkillDamageInTerms,
+        FirstSkillCooldownInPercent,
+        SecondSkillDamageInPercent,
+        SecondSkillDamageInTerms,
+        SecondSkillCooldownInPercent,
         MaxHealthInPercent,
         MaxHealthInTerms,
         ArmorInPercent,
-        ArmorInTerms,
-        CooldownInPercent,
+        ArmorInTerms
+    }
+
+    public enum RewardType
+    {
+        Upgrade,
         Money
     }
     
@@ -22,7 +28,8 @@ namespace _Project.Scripts.ScriptableObjects
         public string upgradeName;
         [TextArea] public string description;
         public Sprite icon;
-        public UpgradeType type;
+        public RewardType rewardType;
+        [Tooltip("Використовується тільки якщо RewardType == Upgrade")] public UpgradeType type;
         public float value;
     }
 }

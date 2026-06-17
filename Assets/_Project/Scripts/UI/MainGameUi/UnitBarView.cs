@@ -1,55 +1,113 @@
-using _Project.Scripts.Core;
+using _Project.Scripts.Runtime.Characters;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
+using System;
 
 namespace _Project.Scripts.UI.MainGameUi
 {
     public class UnitBarView : MonoBehaviour
     {
-        [SerializeField] private Button _firstSkillButton;
-        [SerializeField] private Button _secondSkillButton;
-        
-        private GameEventBus _eventBus;
+        [Header("UI References")]
+        [SerializeField] private Image _healthBar;
+        [SerializeField] private Image _characterIcon;
+        [SerializeField] private Button[] _skillButtons; // Масив кнопок для скілів
 
-        [Inject]
-        public void Construct(GameEventBus eventBus)
-        {
-            _eventBus = eventBus;
-        }
+        private UnitController _unit;
 
-        private void OnEnable()
+        public void Bind(UnitController unit)
         {
-            _firstSkillButton.onClick.AddListener(ReduceFirstSkillCooldown);
-            _secondSkillButton.onClick.AddListener(ReduceSecondSkillCooldown);
+            if (_unit == unit)
+                return;
+            if (_unit != null)
+            {
+                _unit.OnSkillCooldownUpdatedForUI -= UpdateSkillUI;
+                _unit.OnHealthChanged -= UpdateHealthBar;
+            }
             
-            _eventBus.OnSkillCooldownUpdate += UpdateSkillUI;
-        }
-
-        private void OnDisable()
-        {
-            _firstSkillButton.onClick.RemoveListener(ReduceFirstSkillCooldown);
-            _secondSkillButton.onClick.RemoveListener(ReduceSecondSkillCooldown);
+            _unit = unit ?? throw new ArgumentNullException(nameof(unit));
             
-            _eventBus.OnSkillCooldownUpdate -= UpdateSkillUI;
+            // Іконка персонажа
+            if (_unit.MyUnitData && _characterIcon)
+                _characterIcon.sprite = _unit.MyUnitData.unitIcon;
+
+            // Підписка на кнопки скілів
+            for (int i = 0; i < _skillButtons.Length; i++)
+            {
+                int skillIndex = i; // локальна копія для замикання
+                if (_skillButtons[i] != null)
+                {
+                    _skillButtons[i].onClick.RemoveAllListeners();
+                    _skillButtons[i].onClick.AddListener(() => OnSkillClicked(skillIndex));
+                }
+            }
+
+            // Підписка на події з UnitController
+            _unit.OnSkillCooldownUpdatedForUI += UpdateSkillUI;
+            _unit.OnHealthChanged += UpdateHealthBar;
+
+            // Початкове оновлення UI
+            UpdateHealthBar(_unit.CurrentHealth, _unit.MaxHealth);
+            UpdateAllSkillUI();
         }
 
-        private void ReduceFirstSkillCooldown()
+        private void OnDestroy()
         {
-            _eventBus.SignalToReduceSkill(0);
+            if (_unit != null)
+            {
+                _unit.OnSkillCooldownUpdatedForUI -= UpdateSkillUI;
+                _unit.OnHealthChanged -= UpdateHealthBar;
+            }
+
+            if (_skillButtons != null)
+            {
+                foreach (var btn in _skillButtons)
+                    btn.onClick.RemoveAllListeners();
+            }
         }
 
-        private void ReduceSecondSkillCooldown()
+        private void OnSkillClicked(int skillIndex)
         {
-            _eventBus.SignalToReduceSkill(1);
+            _unit.ReduceCooldown(skillIndex);
         }
-        
-        private void UpdateSkillUI(int index, float fill)
+
+        private void UpdateSkillUI(int skillIndex, float fill)
         {
-            if (index == 0)
-                _firstSkillButton.image.fillAmount = fill;
-            else if (index == 1)
-                _secondSkillButton.image.fillAmount = fill;
+            if (_skillButtons == null || skillIndex < 0 || skillIndex >= _skillButtons.Length)
+                return;
+
+            var btn = _skillButtons[skillIndex];
+            if (btn != null && btn.image != null)
+                btn.image.fillAmount = Mathf.Clamp01(fill);
+        }
+
+        private void UpdateAllSkillUI()
+        {
+            if (_unit == null || _skillButtons == null)
+                return;
+
+            for (int i = 0; i < _skillButtons.Length; i++)
+            {
+                var btn = _skillButtons[i];
+                if (btn != null)
+                {
+                    var skillRuntime = _unit.GetSkillRuntime(i);
+                    if (skillRuntime != null && skillRuntime.rawCooldown > 0f)
+                    {
+                        btn.gameObject.SetActive(true);
+                        btn.image.fillAmount = 1f - (skillRuntime.cooldownRemaining / skillRuntime.rawCooldown);
+                    }
+                    else
+                    {
+                        btn.gameObject.SetActive(false);
+                    }
+                }
+            }
+        }
+
+        private void UpdateHealthBar(int currentHp, int maxHp)
+        {
+            if (_healthBar != null && maxHp > 0)
+                _healthBar.fillAmount = Mathf.Clamp01((float)currentHp / maxHp);
         }
     }
 }

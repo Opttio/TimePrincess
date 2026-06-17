@@ -15,5 +15,6 @@ MonoBehaviour:
   upgradeName: Max health in percent
   description: Upgrade your max health at a specified percentage
   icon: {fileID: 0}
-  type: 4
+  rewardType: 0
+  type: 6
   value: 5

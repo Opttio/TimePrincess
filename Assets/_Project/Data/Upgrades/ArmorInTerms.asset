@@ -15,5 +15,6 @@ MonoBehaviour:
   upgradeName: Armor in terms
   description: Upgrade your armor in absolute terms
   icon: {fileID: 0}
-  type: 7
+  rewardType: 0
+  type: 9
   value: 1

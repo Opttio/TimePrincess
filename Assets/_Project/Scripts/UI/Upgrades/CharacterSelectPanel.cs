@@ -1,7 +1,6 @@
 using System;
 using _Project.Scripts.Managers;
 using _Project.Scripts.ScriptableObjects;
-using _Project.Scripts.UI.UiManagers;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -38,7 +37,7 @@ namespace _Project.Scripts.UI.Upgrades
             _onChosen = onChosen;
 
             // Отримуємо список активних юнітів з AllyManager
-            var activeUnits = _allyManager.GetActiveUnits();
+            var activeUnits = _allyManager.GetActiveUnitTypes();
 
             for (int i = 0; i < _unitButtons.Length; i++)
             {
@@ -49,7 +48,8 @@ namespace _Project.Scripts.UI.Upgrades
 
                     // Вмикаємо кнопку та встановлюємо іконку
                     _unitButtons[i].gameObject.SetActive(true);
-                    _unitIcons[i].sprite = unitData?.unitIcon;
+                    if (unitData)
+                        _unitIcons[i].sprite = unitData.unitIcon;
 
                     int index = i; // для замикання
                     _unitButtons[i].onClick.RemoveAllListeners();
@@ -68,9 +68,6 @@ namespace _Project.Scripts.UI.Upgrades
         private void ChooseUnit(Units unit)
         {
             _onChosen?.Invoke(unit, _pendingUpgrade);
-            
-            // 🔹 Додай це, щоб закривати UI через TestUpgradeViewManager
-            FindFirstObjectByType<TestUpgradeViewManager>()?.OnUnitChosen();
             
             _pendingUpgrade = null;
             gameObject.SetActive(false);

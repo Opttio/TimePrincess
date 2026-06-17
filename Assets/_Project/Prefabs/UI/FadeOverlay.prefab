@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 478593585859389938}
   - component: {fileID: 6237942349740303307}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: FadeOverlay
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -60,7 +60,7 @@ GameObject:
   - component: {fileID: 7498141641664420457}
   - component: {fileID: 6760290116678309233}
   - component: {fileID: 4152846140409016640}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: 'FadeWindow[Image]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}

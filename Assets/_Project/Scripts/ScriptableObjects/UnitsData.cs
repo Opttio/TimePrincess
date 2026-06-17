@@ -8,7 +8,10 @@ namespace _Project.Scripts.ScriptableObjects
         PrincessChrona,
         MageBalis,
         BasicWarrior,
-        BasicArcher
+        BasicArcher,
+        OrcBluugar,
+        BasicOrcWarrior,
+        BasicOrcSpearman
     }
     
     [CreateAssetMenu(fileName = "UnitData", menuName = "Units/UnitData", order = 0)]
@@ -18,6 +21,9 @@ namespace _Project.Scripts.ScriptableObjects
         public string unitName;
         public Units unitType;
         public Sprite unitIcon; // 🟢 нове поле для іконки в UI
+        
+        [Header("Slot & Priority")]
+        public int slotPriority;
 
         [Header("Stats")]
         public int maxHealth;

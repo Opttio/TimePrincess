@@ -15,5 +15,6 @@ MonoBehaviour:
   upgradeName: Money
   description: Take some money
   icon: {fileID: 21300000, guid: 1b5c239ef0c03af4c9cf1d5b8e8e3a96, type: 3}
-  type: 9
+  rewardType: 1
+  type: 10
   value: 2

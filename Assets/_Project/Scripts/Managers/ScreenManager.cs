@@ -1,159 +1,81 @@
-using System.Collections.Generic;
-using _Project.Scripts.UI.UiManagers;
-using UnityEngine;
+using _Project.Scripts.Core;
+using _Project.Scripts.Services;
+using _Project.Scripts.UI.Upgrades;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 namespace _Project.Scripts.Managers
 {
     public class ScreenManager : MonoBehaviour
     {
-        [SerializeField] private List<GameObject> _screens;       // Усі Screen-и рівня
-        [SerializeField] private Transform _cameraTransform;      // Камера
-        [SerializeField] private CanvasGroup _fadeCanvas;         // Canvas для затемнення
-        [SerializeField] private float _fadeDuration = 1f;        // Тривалість fade
-        [SerializeField] private float _moveDelay = 0.1f;         // Момент затримки між переходами
-        [SerializeField] private TestUpgradeViewManager _testUpgradeViewManager;       //Тільки для тесту
-
-        private int _currentScreenIndex = 0;
-        private bool _isTransitioning = false;
-        
-        private AllyManager _allyManager;
+        private ScreenRegistry _registry;
+        private ScreenTransitionService _transition;
+        private ScreenGameplayBinder _binder;
+        private CameraManager _cameraManager;
+        private BattleManager _battleManager;
+        private UpgradeViewManager _upgradeViewManager;
+        private GameEventBus _eventBus;
 
         [Inject]
-        public void Construct(AllyManager allyManager)
+        public void Construct(
+            ScreenRegistry registry,
+            ScreenTransitionService transition,
+            ScreenGameplayBinder binder,
+            CameraManager cameraManager,
+            BattleManager battleManager,
+            UpgradeViewManager upgradeViewManager,
+            GameEventBus eventBus)
         {
-            _allyManager = allyManager;
-        }
-
-        private void Awake()
-        {
-            _fadeCanvas.blocksRaycasts = false;
-            _fadeCanvas.interactable = false;
-            _fadeCanvas.alpha = 0;
+            _registry = registry;
+            _transition = transition;
+            _binder = binder;
+            _cameraManager = cameraManager;
+            _battleManager = battleManager;
+            _upgradeViewManager = upgradeViewManager;
+            _eventBus = eventBus;
         }
 
         private void Start()
         {
-             // Увімкнути тільки перший Screen
-            for (int i = 0; i < _screens.Count; i++)
-                _screens[i].SetActive(i == 0);
-            
-            SetAllySlotsForCurrentScreen();
+            ActivateCurrent();
+            _binder.Bind(_registry.CurrentScreen);
+            _battleManager.Initialize();
         }
 
-        private void Update()
+        public async UniTaskVoid GoNextScreen()
         {
-            if (_isTransitioning) return;
+            _eventBus.BattlePause();
+            if (!_registry.HasNextScreen())
+            {
+                _upgradeViewManager.gameObject.SetActive(true);
+                return;
+            }
 
-            // Тест вручну клавішею N
-            if (Input.GetKeyDown(KeyCode.N))
-                _ = TryGoToNextScreenAsync();
+            await _transition.FadeAsync(1f);
 
-            // Автоматична перевірка
-            // if (AllEnemiesDefeatedOnCurrent())
-            //     _ = TryGoToNextScreenAsync();
+            var next = _registry.GoNext();
+
+            ActivateCurrent();
+
+            _cameraManager.MoveTo(next.CameraPoint);
+
+            _binder.Bind(next);
+            _battleManager.Dispose();
+            _battleManager.Initialize();
+
+            await _transition.FadeAsync(0f);
+            _eventBus.BattleResume();
         }
 
-        private bool AllEnemiesDefeatedOnCurrent()
+        private void ActivateCurrent()
         {
-            GameObject current = _screens[_currentScreenIndex];
-            foreach (Transform child in current.GetComponentsInChildren<Transform>(false))
+            var screens = _registry.Screens;
+            var current = _registry.CurrentScreen;
+
+            for (int i = 0; i < screens.Count; i++)
             {
-                if (child.CompareTag("Enemy") && child.gameObject.activeInHierarchy)
-                    return false;
-            }
-            return true;
-        }
-        
-        private Transform[] GetAllySlots(GameObject screen)
-        {
-            var spawnPointsParent = screen.transform.Find("Ally/SpawnPoints");
-            Transform[] slots = new Transform[4];
-
-            foreach (var t in spawnPointsParent.GetComponentsInChildren<Transform>())
-            {
-                if (t.CompareTag("FrontUpPoint")) slots[0] = t;
-                else if (t.CompareTag("FrontDownPoint")) slots[1] = t;
-                else if (t.CompareTag("BackUpPoint")) slots[2] = t;
-                else if (t.CompareTag("BackDownPoint")) slots[3] = t;
-            }
-            return slots;
-        }
-        
-        private void SetAllySlotsForCurrentScreen()
-        {
-            var currentScreen = _screens[_currentScreenIndex];
-            var slots = GetAllySlots(currentScreen);
-            _allyManager.SetActiveScreenSlots(slots);
-        }
-
-        private async UniTaskVoid TryGoToNextScreenAsync()
-        {
-            if (_isTransitioning) return;
-            // if (_currentScreenIndex >= _screens.Count - 1) return; // Кінець рівня
-            if (_currentScreenIndex >= _screens.Count - 1)
-            {
-                Debug.Log("✅ Level completed! Opening upgrade UI...");
-                // 🔹 Виклик тестового Upgrade UI
-                FindFirstObjectByType<TestUpgradeViewManager>()?.ShowUpgrades();
-                return; // зупиняємо, бо це фінал рівня
-            }
-
-            _isTransitioning = true;
-            _currentScreenIndex++;
-
-            var nextScreen = _screens[_currentScreenIndex];
-
-            await FadeAsync(1f); // Затемнення
-
-            // Переміщення камери
-            Transform cameraPoint = nextScreen.transform.Find("CameraPosition");
-            if (cameraPoint)
-            {
-                _cameraTransform.position = cameraPoint.position;
-                _cameraTransform.rotation = cameraPoint.rotation;
-            }
-
-            // Перемикання активного Screen
-            for (int i = 0; i < _screens.Count; i++)
-                _screens[i].SetActive(i == _currentScreenIndex);
-            
-            SetAllySlotsForCurrentScreen();
-
-            await UniTask.Delay(System.TimeSpan.FromSeconds(_moveDelay));
-
-            await FadeAsync(0f); // Розтемнення
-
-            _isTransitioning = false;
-        }
-
-        private async UniTask FadeAsync(float targetAlpha)
-        {
-            float startAlpha = _fadeCanvas.alpha;
-            float time = 0f;
-
-            // 🔹 Якщо потемнення — блокуємо кліки
-            if (targetAlpha > 0f)
-            {
-                _fadeCanvas.blocksRaycasts = true;
-                _fadeCanvas.interactable = true;
-            }
-
-            while (time < _fadeDuration)
-            {
-                time += Time.deltaTime;
-                _fadeCanvas.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / _fadeDuration);
-                await UniTask.Yield();
-            }
-
-            _fadeCanvas.alpha = targetAlpha;
-
-            // 🔹 Якщо розтемнення — розблокуємо кліки
-            if (Mathf.Approximately(targetAlpha, 0f))
-            {
-                _fadeCanvas.blocksRaycasts = false;
-                _fadeCanvas.interactable = false;
+                screens[i].gameObject.SetActive(screens[i] == current);
             }
         }
     }

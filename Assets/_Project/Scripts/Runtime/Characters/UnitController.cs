@@ -4,34 +4,43 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 using System;
-using System.Threading;
+using _Project.Scripts.Runtime.Environment;
+using _Project.Scripts.Runtime.RuntimeData;
+using _Project.Scripts.Runtime.Systems;
 
 namespace _Project.Scripts.Runtime.Characters
 {
-    [System.Serializable]
-    public class SkillRuntimeData
+    public enum TeamType
     {
-        public string skillName;
-        public int damage;
-        public float rawCooldown;
-        public float cooldownRemaining;
+        Ally,
+        Enemy
     }
     
     public class UnitController : MonoBehaviour
     {
         [SerializeField] private UnitsData _myUnitData;
-        [SerializeField] private bool _isEnemy;
+        [SerializeField] private TeamType _team;
         
         public UnitsData MyUnitData => _myUnitData;
+        public event Action<int, float> OnSkillCooldownUpdatedForUI;
+        public event Action<int, int> OnHealthChanged;
+        public event Action<UnitController> OnUnitDied;
 
-        private int _maxHealth;
-        private int _currentHealth;
-        private float _armor;
         private SkillRuntimeData[] _skills;
-        private Action[] _reduceSkillLambdas;
-        private CancellationTokenSource _cts;
+        private SkillSystem _skillSystem;
+        
+        private HealthRuntimeData _healthData;
+        private HealthSystem _healthSystem;
+        
+        private UnitSlot _currentSlot;
+        private UnitStatsSystem _statsSystem;
 
         private GameEventBus _eventBus;
+        
+        public int CurrentHealth => _healthData.currentHealth;
+        public int MaxHealth => _healthData.maxHealth;
+        public UnitSlot CurrentSlot => _currentSlot;
+        public TeamType Team => _team;
 
         [Inject]
         public void Construct(GameEventBus eventBus)
@@ -39,53 +48,124 @@ namespace _Project.Scripts.Runtime.Characters
             _eventBus = eventBus;
         }
 
-        private void Start()
+        private void Awake()
         {
             InitializeFields();
-            if (!_isEnemy)
-            {
-                _cts = new CancellationTokenSource();
-                for (int i = 0; i < _skills.Length; i++)
-                {
-                    var skill = _skills[i];
-                    RunSkillLoop(skill, _cts.Token).Forget();
-                }
-            }
         }
+
         private void OnEnable()
         {
-            if (_isEnemy)
-                _eventBus.OnPlayerAttack += TakeDamage;
-            else
-                _eventBus.OnEnemyAttack += TakeDamage;
-
-            // Підписка на універсальну подію
-            _eventBus.OnReduceSkillCooldown += HandleReduceSkillCooldown;
+            Subscribe();
         }
 
         private void OnDisable()
         {
-            if (_isEnemy)
-                _eventBus.OnPlayerAttack -= TakeDamage;
-            else
-                _eventBus.OnEnemyAttack -= TakeDamage;
+            Unsubscribe();
+        }
 
-            _eventBus.OnReduceSkillCooldown -= HandleReduceSkillCooldown;
-            
-            if (_cts != null && !_cts.IsCancellationRequested)
+        private void Update()
+        {
+            if (Input.GetKeyDown(KeyCode.H))
             {
-                _cts.Cancel();
-                _cts.Dispose();
-                _cts = null;
+                Debug.Log($"{name} HP = {CurrentHealth}/{MaxHealth}");
             }
         }
+
+        public void ReduceCooldown(int index)
+        {
+            _skillSystem?.ReduceCooldown(index, _myUnitData.clickCooldownReductionPercent / 100f);
+        }
         
+        public SkillRuntimeData GetSkillRuntime(int index)
+        {
+            if (_skills == null || index < 0 || index >= _skills.Length)
+                return null;
+            return _skills[index];
+        }
+
+        public void TakeDamage(int damage) => _healthSystem.TakeDamage(damage);
+        
+        public void BindToSlot(UnitSlot slot) => _currentSlot = slot;
+        
+        public void Unbind() => _currentSlot = null;
+        
+        public void ApplyUpgrade(UpgradeData data)
+        {
+            _statsSystem.ApplyUpgrade(data);
+            Debug.Log($"[{name}] Applied {data.upgradeName}");
+        }
+        
+        public void ResetSession() => _statsSystem.ResetSession();
+
         private void InitializeFields()
         {
-            _maxHealth = _myUnitData.maxHealth;
-            _currentHealth = _maxHealth;
-            _armor = _myUnitData.armor;
+            _statsSystem = new UnitStatsSystem(_myUnitData, new UnitStatsData());
+            InitializeHealth();
+            InitializeSkills();
+        }
 
+        private void Subscribe()
+        {
+            if (_skillSystem == null) return;
+            _skillSystem.OnCooldownUpdated -= OnCooldownProxy;
+            _skillSystem.OnCooldownUpdated += OnCooldownProxy;
+            
+            if(_healthSystem == null) return;
+            _healthSystem.OnHealthChanged -= OnHealthProxy;
+            _healthSystem.OnHealthChanged += OnHealthProxy;
+            _healthSystem.OnDeath -= OnDeathProxy;
+            _healthSystem.OnDeath += OnDeathProxy;
+
+            _eventBus.OnBattlePause -= OnPaused;
+            _eventBus.OnBattlePause += OnPaused;
+            _eventBus.OnBattleResume -= OnResumed;
+            _eventBus.OnBattleResume += OnResumed;
+        }
+
+        private void Unsubscribe()
+        {
+            if (_skillSystem == null) return;
+            _skillSystem.OnCooldownUpdated -= OnCooldownProxy;
+            
+            if(_healthSystem == null) return;
+            _healthSystem.OnHealthChanged -= OnHealthProxy;
+            _healthSystem.OnDeath -= OnDeathProxy;
+            
+            _eventBus.OnBattlePause -= OnPaused;
+            _eventBus.OnBattleResume -= OnResumed;
+        }
+        
+        private void OnCooldownProxy(int index, float fill)
+        {
+            OnSkillCooldownUpdatedForUI?.Invoke(index, fill);
+        }
+
+        private void OnHealthProxy(int current, int max)
+        {
+            OnHealthChanged?.Invoke(current, max);
+        }
+
+        private void OnDeathProxy()
+        {
+            Debug.Log($"{name} died", this);
+            OnUnitDied?.Invoke(this);
+            CurrentSlot.ClearUnit();
+            gameObject.SetActive(false);
+        }
+
+        private void InitializeHealth()
+        {
+            _healthData = new HealthRuntimeData();
+            _healthData.maxHealth = _statsSystem.GetMaxHealth();
+            _healthData.currentHealth = _healthData.maxHealth;
+            _healthData.armor = _statsSystem.GetArmor();
+            _healthSystem = new HealthSystem(_healthData);
+            
+            OnHealthChanged?.Invoke(_healthData.currentHealth, _healthData.maxHealth);
+        }
+
+        private void InitializeSkills()
+        {
             _skills = new SkillRuntimeData[_myUnitData.skillData.Length];
 
             for (int i = 0; i < _myUnitData.skillData.Length; i++)
@@ -93,85 +173,25 @@ namespace _Project.Scripts.Runtime.Characters
                 var data = _myUnitData.skillData[i];
                 _skills[i] = new SkillRuntimeData
                 {
+                    skillIndex = i,
                     skillName = data.skillName,
-                    damage = Mathf.Max(data.damage, 0),
-                    rawCooldown = Mathf.Max(data.cooldown, 0f),
+                    damage = _statsSystem.GetSkillDamage(i),
+                    rawCooldown = _statsSystem.GetSkillCooldown(i),
                     cooldownRemaining = Mathf.Max(data.cooldown, 0f)
                 };
             }
-        }
-        
-        private void TakeDamage(int damage)
-        {
-            if (_currentHealth <= 0)
-                return;
-
-            int finalDamage = ApplyArmor(damage, _armor);
-            _currentHealth -= finalDamage;
-
-            Debug.Log($"{_myUnitData.unitName} took {finalDamage} dmg (raw: {damage}, armor: {_armor}) -> HP = {_currentHealth}");
-
-            if (_currentHealth <= 0)
-            {
-                Debug.Log($"{_myUnitData.unitName} died");
-                // TODO: деактивуємо, відписуємось, ставимо труп і т.д.
-            }
+            _skillSystem = new SkillSystem(_skills, _eventBus, _team, this.GetCancellationTokenOnDestroy());
             
-        }
-        
-        private int ApplyArmor(int damage, float armor)
-        {
-            int finalDmg = Mathf.FloorToInt(damage * (100f / (100f + armor)));
-            return Mathf.Max(finalDmg, 1); // мінімум 1 dmg
-        }
-        
-        private void HandleReduceSkillCooldown(int skillIndex)
-        {
-            if (skillIndex < 0 || skillIndex >= _skills.Length)
-                return;
-            var skill = _skills[skillIndex];
-            if (skill.cooldownRemaining <= 0f)
-                return;
-
-            float reduction = skill.cooldownRemaining * (_myUnitData.clickCooldownReductionPercent / 100f);
-            reduction = Mathf.Clamp(reduction, 0.5f, 2f);
-            skill.cooldownRemaining = Mathf.Max(skill.cooldownRemaining - reduction, 0f);
-
-            Debug.Log($"{skill.skillName} cooldown reduced by {reduction:F2} → {skill.cooldownRemaining:F2}");
+            _skillSystem.StartSkillLoops();
         }
 
-        private async UniTaskVoid RunSkillLoop(SkillRuntimeData skill, CancellationToken token)
+        private void OnPaused() => _skillSystem?.SetPause(true);
+        private void OnResumed() => _skillSystem?.SetPause(false);
+
+        //ТЕСТ перевірка що демедж проходить.
+        public void DebugTakeDamage(int damage)
         {
-            // UniTaskVoid використовується для "fire-and-forget" з UniTask
-            while (!token.IsCancellationRequested)
-            {
-                // атака
-                Debug.Log($"{_myUnitData.unitName} attack for {skill.damage}");
-                if (_isEnemy)
-                    _eventBus.EnemyAttacked(skill.damage);
-                else
-                    _eventBus.PlayerAttacked(skill.damage);
-
-                // встановлюємо початковий КД
-                skill.cooldownRemaining = skill.rawCooldown;
-
-                // цикл кулдауну
-                while (skill.cooldownRemaining > 0f && !token.IsCancellationRequested)
-                {
-                    skill.cooldownRemaining -= Time.deltaTime;
-                    skill.cooldownRemaining = Mathf.Max(skill.cooldownRemaining, 0f);
-
-                    float fill = 1f - (skill.cooldownRemaining / skill.rawCooldown);
-                    _eventBus.SkillCooldownUpdated(Array.IndexOf(_skills, skill), fill);
-
-                    await UniTask.Yield(PlayerLoopTiming.Update, token);
-                }
-
-                // КД закінчився — UI на 1
-                _eventBus.SkillCooldownUpdated(Array.IndexOf(_skills, skill), 1f);
-
-                await UniTask.Yield(token);
-            }
+            TakeDamage(damage);
         }
     }
 }

@@ -15,5 +15,6 @@ MonoBehaviour:
   upgradeName: Max health in terms
   description: Upgrade your max health in absolute terms
   icon: {fileID: 0}
-  type: 5
+  rewardType: 0
+  type: 7
   value: 8
