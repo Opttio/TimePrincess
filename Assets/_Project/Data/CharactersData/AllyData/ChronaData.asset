@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa3513c255044890b1b7316fb1823725, type: 3}
+  m_Name: ChronaData
+  m_EditorClassIdentifier: 
+  unitName: Chrona
+  unitType: 1
+  unitIcon: {fileID: 21300000, guid: 5db25b90adf39074380774a07df5057c, type: 3}
+  slotPriority: 900
+  maxHealth: 100
+  armor: 3
+  clickCooldownReductionPercent: 10
+  skillData:
+  - skillName: LightBall
+    damage: 10
+    cooldown: 45
+  - skillName: AllHeal
+    damage: 25
+    cooldown: 80

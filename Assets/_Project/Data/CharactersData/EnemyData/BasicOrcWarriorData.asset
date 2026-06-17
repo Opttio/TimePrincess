@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa3513c255044890b1b7316fb1823725, type: 3}
+  m_Name: BasicOrcWarriorData
+  m_EditorClassIdentifier: Assembly-CSharp::_Project.Scripts.ScriptableObjects.MyUnitData
+  unitName: BasicOrcWarrior
+  unitType: 6
+  unitIcon: {fileID: 21300000, guid: b979cd6dd2bb1e74884e312bc9e886e2, type: 3}
+  slotPriority: 2
+  maxHealth: 120
+  armor: 8
+  clickCooldownReductionPercent: 10
+  skillData:
+  - skillName: BasicOrcWarriorStrike
+    damage: 3
+    cooldown: 20
+  - skillName: BasicOrcWarriorHardStrike
+    damage: 8
+    cooldown: 70
