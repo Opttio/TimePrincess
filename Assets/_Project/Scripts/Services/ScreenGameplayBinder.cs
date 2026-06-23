@@ -28,8 +28,6 @@ namespace _Project.Scripts.Services
             _allyManager.ReassignAllies();
 
             _enemyManager.SetActiveSlots(screen.EnemySlots);
-
-            _bonusManager.GetRandomBonus();
         }
     }
 }

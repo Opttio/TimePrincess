@@ -181,7 +181,7 @@ namespace _Project.Scripts.Runtime.Characters
                 };
             }
             _skillSystem = new SkillSystem(_skills, _eventBus, _team, this.GetCancellationTokenOnDestroy());
-            
+            _skillSystem.SetPause(_eventBus.IsBattlePause);
             _skillSystem.StartSkillLoops();
         }
 

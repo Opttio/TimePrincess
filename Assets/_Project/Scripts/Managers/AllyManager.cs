@@ -3,7 +3,6 @@ using _Project.Scripts.Core;
 using _Project.Scripts.Runtime.Characters;
 using _Project.Scripts.Runtime.Environment;
 using _Project.Scripts.ScriptableObjects;
-using Unity.Android.Gradle.Manifest;
 using UnityEngine;
 using Zenject;
 using Action = System.Action;
@@ -191,6 +190,29 @@ namespace _Project.Scripts.Managers
         {
             foreach (var unit in _alliesInstances)
                 unit.ResetSession();
+        }
+
+        public void AddAlly(UnitController prefab)
+        {
+            var instance = _container.InstantiatePrefabForComponent<UnitController>(prefab.gameObject, _allyInstancesBox);
+            instance.gameObject.name = prefab.name;
+            instance.gameObject.SetActive(false);
+            
+            _alliesInstances.Add(instance);
+            
+            ReassignAllies();
+            OnAlliesReassigned?.Invoke();
+        }
+
+        public bool HasFreeSlot()
+        {
+            if (_activeSlots == null) return false;
+            foreach (var slot in _activeSlots)
+            {
+                if (slot.OccupiedUnit == null)
+                    return true;
+            }
+            return false;
         }
 
         private List<UnitController> GetActiveUnitControllers()

@@ -16,6 +16,7 @@ namespace _Project.Scripts.Managers
         private BattleManager _battleManager;
         private UpgradeViewManager _upgradeViewManager;
         private GameEventBus _eventBus;
+        private BonusManager _bonusManager;
 
         [Inject]
         public void Construct(
@@ -25,7 +26,8 @@ namespace _Project.Scripts.Managers
             CameraManager cameraManager,
             BattleManager battleManager,
             UpgradeViewManager upgradeViewManager,
-            GameEventBus eventBus)
+            GameEventBus eventBus,
+            BonusManager bonusManager)
         {
             _registry = registry;
             _transition = transition;
@@ -34,6 +36,7 @@ namespace _Project.Scripts.Managers
             _battleManager = battleManager;
             _upgradeViewManager = upgradeViewManager;
             _eventBus = eventBus;
+            _bonusManager = bonusManager;
         }
 
         private void Start()
@@ -46,9 +49,16 @@ namespace _Project.Scripts.Managers
         public async UniTaskVoid GoNextScreen()
         {
             _eventBus.BattlePause();
+            var slot = _registry.CurrentScreen.BonusSlot;
+            if (slot.IsEnabled())
+            {
+                await _bonusManager.WaitForPlayerChoice(slot.Database);
+            }
+            
             if (!_registry.HasNextScreen())
             {
                 _upgradeViewManager.gameObject.SetActive(true);
+                //TODO: Реалізувати зняття з паузи після вибору Upgrade.
                 return;
             }
 

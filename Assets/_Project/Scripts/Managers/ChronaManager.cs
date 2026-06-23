@@ -24,5 +24,10 @@ namespace _Project.Scripts.Managers
         {
             return !_meta.IsChronaRescued;
         }
+
+        public bool IsChronaInParty()
+        {
+            return _run.IsChronaInParty;
+        }
     }
 }
