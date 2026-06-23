@@ -40,9 +40,10 @@ namespace _Project.Scripts.Runtime.Systems
                 return;
             _healthsData.currentHealth += heal;
             _healthsData.currentHealth = Mathf.Min(_healthsData.currentHealth, _healthsData.maxHealth);
+            OnHealthChanged?.Invoke(_healthsData.currentHealth, _healthsData.maxHealth);
         }
         
-        private int ApplyArmor(int damage, float armor)
+        public static int ApplyArmor(int damage, float armor)
         {
             int finalDmg = Mathf.FloorToInt(damage * (100f / (100f + armor)));
             return Mathf.Max(finalDmg, 1); // мінімум 1 dmg

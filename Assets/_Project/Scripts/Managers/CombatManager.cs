@@ -26,12 +26,14 @@ namespace _Project.Scripts.Managers
         {
             _eventBus.OnPlayerAttack += HandlePlayerAttack;
             _eventBus.OnEnemyAttack += HandleEnemyAttack;
+            _eventBus.OnPlayerHeal += HandlePlayerHeal;
         }
 
         private void OnDisable()
         {
             _eventBus.OnPlayerAttack -= HandlePlayerAttack;
             _eventBus.OnEnemyAttack -= HandleEnemyAttack;
+            _eventBus.OnPlayerHeal -= HandlePlayerHeal;
         }
 
         private void HandlePlayerAttack(int damage)
@@ -42,9 +44,17 @@ namespace _Project.Scripts.Managers
                 target.TakeDamage(damage);
         }
 
+        private void HandlePlayerHeal(int amount)
+        {
+            foreach (var unit in _allyManager.GetAllUnits())
+            {
+                unit.Heal(amount);
+            }
+        }
+
         private void HandleEnemyAttack(int damage)
         {
-            var target = _allyManager.GetTargetAlly();
+            var target = _allyManager.GetTargetAlly(damage);
             
             if (target != null)
                 target.TakeDamage(damage);

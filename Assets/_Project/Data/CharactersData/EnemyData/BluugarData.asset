@@ -21,8 +21,10 @@ MonoBehaviour:
   clickCooldownReductionPercent: 10
   skillData:
   - skillName: BluugarSwordStrike
-    damage: 7
+    value: 8
     cooldown: 30
+    skillType: 0
   - skillName: BluugarMeteorCast
-    damage: 30
+    value: 80
     cooldown: 140
+    skillType: 0

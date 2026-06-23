@@ -3,6 +3,7 @@ using System.Threading;
 using _Project.Scripts.Core;
 using _Project.Scripts.Runtime.Characters;
 using _Project.Scripts.Runtime.RuntimeData;
+using _Project.Scripts.ScriptableObjects;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -70,16 +71,24 @@ namespace _Project.Scripts.Runtime.Systems
                     await UniTask.Yield(PlayerLoopTiming.Update, _token);
                 }
 
-                if (!_token.IsCancellationRequested)
-                {
-                    if (_team == TeamType.Enemy)
-                        _eventBus?.EnemyAttacked(skill.damage);
-                    else
-                        _eventBus?.PlayerAttacked(skill.damage);
-                }
+                if (!_token.IsCancellationRequested) 
+                    ApplySkill(skill);
                 
                 OnCooldownUpdated?.Invoke(skill.skillIndex, 1f);
                 await UniTask.Yield(_token);
+            }
+        }
+
+        private void ApplySkill(SkillRuntimeData skill)
+        {
+            if (_team == TeamType.Enemy)
+                _eventBus?.EnemyAttacked(skill.value);
+            else
+            {
+                if (skill.skillType == SkillType.Heal)
+                    _eventBus?.PlayerHeal(skill.value);
+                else
+                    _eventBus?.PlayerAttacked(skill.value);
             }
         }
     }

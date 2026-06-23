@@ -22,19 +22,19 @@ namespace _Project.Scripts.Runtime.Systems
         
         public float GetArmor() => _base.armor + _session.bonusArmour + _permanent.bonusArmour;
 
-        public int GetSkillDamage(int skillIndex)
+        public int GetSkillValue(int skillIndex)
         {
-            int baseDamage = _base.skillData[skillIndex].damage;
+            int baseValue = _base.skillData[skillIndex].value;
 
             int sessionBonus = skillIndex == 0
-                ? _session.bonusSkill0Damage
-                : _session.bonusSkill1Damage;
+                ? _session.bonusSkill0Value
+                : _session.bonusSkill1Value;
             
             int permanentBonus = skillIndex == 0
-                ? _permanent.bonusSkill0Damage
-                : _permanent.bonusSkill1Damage;
+                ? _permanent.bonusSkill0Value
+                : _permanent.bonusSkill1Value;
             
-            return baseDamage + sessionBonus + permanentBonus;
+            return baseValue + sessionBonus + permanentBonus;
         }
         
         public float GetSkillCooldown(int skillIndex)
@@ -75,21 +75,21 @@ namespace _Project.Scripts.Runtime.Systems
                 case UpgradeType.ArmorInPercent:
                     target.bonusArmour += _base.armor * upgrade.value / 100f;
                     break;
-                case UpgradeType.FirstSkillDamageInTerms:
-                    target.bonusSkill0Damage += Mathf.RoundToInt(upgrade.value);
+                case UpgradeType.FirstSkillValueInTerms:
+                    target.bonusSkill0Value += Mathf.RoundToInt(upgrade.value);
                     break;
-                case UpgradeType.FirstSkillDamageInPercent:
-                    target.bonusSkill0Damage += Mathf.RoundToInt(_base.skillData[0].damage * upgrade.value / 100f);
+                case UpgradeType.FirstSkillValueInPercent:
+                    target.bonusSkill0Value += Mathf.RoundToInt(_base.skillData[0].value * upgrade.value / 100f);
                     break;
                 case UpgradeType.FirstSkillCooldownInPercent:
                     target.bonusSkill0CooldownPercent += upgrade.value;
                     target.bonusSkill0CooldownPercent = Mathf.Min(target.bonusSkill0CooldownPercent, CooldownCap);
                     break;
-                case UpgradeType.SecondSkillDamageInTerms:
-                    target.bonusSkill1Damage += Mathf.RoundToInt(upgrade.value);
+                case UpgradeType.SecondSkillValueInTerms:
+                    target.bonusSkill1Value += Mathf.RoundToInt(upgrade.value);
                     break;
-                case UpgradeType.SecondSkillDamageInPercent:
-                    target.bonusSkill1Damage += Mathf.RoundToInt(_base.skillData[1].damage * upgrade.value / 100f);
+                case UpgradeType.SecondSkillValueInPercent:
+                    target.bonusSkill1Value += Mathf.RoundToInt(_base.skillData[1].value * upgrade.value / 100f);
                     break;
                 case UpgradeType.SecondSkillCooldownInPercent:
                     target.bonusSkill1CooldownPercent += upgrade.value;

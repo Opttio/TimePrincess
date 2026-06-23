@@ -570,6 +570,50 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8858541851735165707, guid: c7b8effb535aba545b62f9f03800c288, type: 3}
   m_PrefabInstance: {fileID: 1678478912}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &214040663
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 214040665}
+  - component: {fileID: 214040664}
+  m_Layer: 0
+  m_Name: CurrencyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &214040664
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 214040663}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f51c54b4269b41f6aa15001896880451, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &214040665
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 214040663}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 898110862}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &218961882
 GameObject:
   m_ObjectHideFlags: 0
@@ -2457,6 +2501,7 @@ Transform:
   - {fileID: 919383547}
   - {fileID: 832799225}
   - {fileID: 641579318}
+  - {fileID: 214040665}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &919383545
@@ -4609,8 +4654,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2110983884}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1448484843 stripped
@@ -4734,7 +4778,7 @@ MonoBehaviour:
   _battleManager: {fileID: 641579317}
   _unitsDatabase: {fileID: 11400000, guid: 687b3ed77a94edb44b30f784f58ed252, type: 2}
   _upgradeViewManager: {fileID: 510081728}
-  _currencyManager: {fileID: 0}
+  _currencyManager: {fileID: 214040664}
 --- !u!4 &1646509913
 Transform:
   m_ObjectHideFlags: 0
@@ -6519,53 +6563,6 @@ Transform:
   - {fileID: 338530300}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2110983883
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2110983884}
-  - component: {fileID: 2110983885}
-  m_Layer: 0
-  m_Name: TestDamageButton
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2110983884
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2110983883}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1389969930}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2110983885
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2110983883}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 93336614496848e3b5158663ccca07e8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _allies: []
-  _damage: 7
-  _key: 55
 --- !u!4 &2135965894 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 202575831621543276, guid: 7b67ce95da0c4154783476f0e7b548f3, type: 3}
@@ -6665,7 +6662,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6237942349740303307, guid: 97996e040d3a60d43810966da24ff297, type: 3}
       propertyPath: m_Alpha
-      value: 0.35557908
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

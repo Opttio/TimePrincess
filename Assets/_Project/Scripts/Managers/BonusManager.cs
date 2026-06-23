@@ -12,11 +12,13 @@ namespace _Project.Scripts.Managers
         
         private BonusPanel _bonusPanel;
         private AllyManager _allyManager;
+        private CurrencyManager _currencyManager;
 
-        public BonusManager(ChronaManager chronaManager, AllyManager allyManager)
+        public BonusManager(ChronaManager chronaManager, AllyManager allyManager, CurrencyManager currencyManager)
         {
             _chronaManager = chronaManager;
             _allyManager = allyManager;
+            _currencyManager = currencyManager;
         }
 
         public void SetPanel(BonusPanel bonusPanel) => _bonusPanel = bonusPanel;
@@ -49,9 +51,23 @@ namespace _Project.Scripts.Managers
             var token = new UniTaskCompletionSource();
             _bonusPanel.Show(bonus, () => token.TrySetResult());
             await token.Task;
-            if (bonus._type == BonusType.NewAlly)
-                _allyManager.AddAlly(bonus.allyPrefab);
-            //TODO: switch/case якщо NewAlly, якщо Money, якщо SessionBuff
+            
+            switch (bonus._type)
+            {
+                case BonusType.NewAlly:
+                    _allyManager.AddAlly(bonus.allyPrefab);
+                    break;
+                case BonusType.Money:
+                    _currencyManager.Add(bonus.amount);
+                    break;
+                case BonusType.Heal:
+                    foreach (var unit in _allyManager.GetAllUnits()) 
+                        unit.Heal(bonus.healAmount);
+                    break;
+                case BonusType.SessionBuff:
+                    //TODO: Отримати UpgradeData для когось з юнітів
+                    break;
+            }
         }
 
         private BonusData GetRandomBonus(BonusDatabase database)

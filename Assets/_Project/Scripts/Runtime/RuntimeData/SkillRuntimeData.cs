@@ -1,3 +1,5 @@
+using _Project.Scripts.ScriptableObjects;
+
 namespace _Project.Scripts.Runtime.RuntimeData
 {
     [System.Serializable]
@@ -5,8 +7,9 @@ namespace _Project.Scripts.Runtime.RuntimeData
     {
         public int skillIndex;
         public string skillName;
-        public int damage;
+        public int value;
         public float rawCooldown;
         public float cooldownRemaining;
+        public SkillType skillType;
     }
 }

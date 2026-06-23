@@ -21,8 +21,10 @@ MonoBehaviour:
   clickCooldownReductionPercent: 10
   skillData:
   - skillName: LightBall
-    damage: 10
+    value: 10
     cooldown: 45
+    skillType: 0
   - skillName: AllHeal
-    damage: 25
+    value: 15
     cooldown: 80
+    skillType: 1

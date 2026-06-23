@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using _Project.Scripts.Core;
 using _Project.Scripts.Runtime.Characters;
 using _Project.Scripts.Runtime.Environment;
+using _Project.Scripts.Runtime.Systems;
 using _Project.Scripts.ScriptableObjects;
 using UnityEngine;
 using Zenject;
@@ -133,13 +135,25 @@ namespace _Project.Scripts.Managers
             OnAlliesReassigned?.Invoke();
         }
 
-        public UnitController GetTargetAlly()
+        public UnitController GetTargetAlly(int incomingDamage)
         {
+            var allUnits = GetActiveUnitControllers().Where(u => u!=null && u.CurrentHealth > 0).ToList();
+            
+            if (allUnits.Count == 0) return null;
+
+            var chrona = allUnits.FirstOrDefault(u => u.MyUnitData.unitType == Units.PrincessChrona);
+            if (chrona != null && allUnits.Count > 1)
+            {
+                int finalDamage = HealthSystem.ApplyArmor(incomingDamage, chrona.MyUnitData.armor);
+
+                if (chrona.CurrentHealth <= finalDamage) 
+                    allUnits.Remove(chrona);
+            }
+            
             var frontUnits = new List<UnitController>();
             var backUnits = new List<UnitController>();
             
-            var units = GetActiveUnitControllers();
-            foreach (var unit in units)
+            foreach (var unit in allUnits)
             {
                 if (unit == null || unit.CurrentHealth <= 0)
                     continue;

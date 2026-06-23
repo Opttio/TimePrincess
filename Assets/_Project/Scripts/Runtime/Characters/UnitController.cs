@@ -85,6 +85,8 @@ namespace _Project.Scripts.Runtime.Characters
 
         public void TakeDamage(int damage) => _healthSystem.TakeDamage(damage);
         
+        public void Heal(int amount) => _healthSystem.Heal(amount);
+        
         public void BindToSlot(UnitSlot slot) => _currentSlot = slot;
         
         public void Unbind() => _currentSlot = null;
@@ -175,9 +177,10 @@ namespace _Project.Scripts.Runtime.Characters
                 {
                     skillIndex = i,
                     skillName = data.skillName,
-                    damage = _statsSystem.GetSkillDamage(i),
+                    value = _statsSystem.GetSkillValue(i),
                     rawCooldown = _statsSystem.GetSkillCooldown(i),
-                    cooldownRemaining = Mathf.Max(data.cooldown, 0f)
+                    cooldownRemaining = Mathf.Max(data.cooldown, 0f),
+                    skillType = data.skillType
                 };
             }
             _skillSystem = new SkillSystem(_skills, _eventBus, _team, this.GetCancellationTokenOnDestroy());
@@ -187,11 +190,5 @@ namespace _Project.Scripts.Runtime.Characters
 
         private void OnPaused() => _skillSystem?.SetPause(true);
         private void OnResumed() => _skillSystem?.SetPause(false);
-
-        //ТЕСТ перевірка що демедж проходить.
-        public void DebugTakeDamage(int damage)
-        {
-            TakeDamage(damage);
-        }
     }
 }

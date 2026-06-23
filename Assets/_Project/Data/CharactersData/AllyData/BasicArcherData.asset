@@ -21,8 +21,10 @@ MonoBehaviour:
   clickCooldownReductionPercent: 10
   skillData:
   - skillName: BasicArcherShoot
-    damage: 2
+    value: 2
     cooldown: 10
+    skillType: 0
   - skillName: BasicArcherArrowsRain
-    damage: 6
+    value: 7
     cooldown: 50
+    skillType: 0

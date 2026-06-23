@@ -7,7 +7,8 @@ namespace _Project.Scripts.ScriptableObjects
     {
         NewAlly,
         Money,
-        SessionBuff
+        SessionBuff,
+        Heal
     }
     
     [CreateAssetMenu(fileName = "BonusData", menuName = "Bonus/BonusData", order = 0)]
@@ -25,5 +26,8 @@ namespace _Project.Scripts.ScriptableObjects
 
         [Header("SessionBuff")]
         public UpgradeData UpgradeData;
+        
+        [Header("Heal")]
+        public int healAmount;
     }
 }

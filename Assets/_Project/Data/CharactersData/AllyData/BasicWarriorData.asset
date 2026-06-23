@@ -21,8 +21,10 @@ MonoBehaviour:
   clickCooldownReductionPercent: 10
   skillData:
   - skillName: BasicWarriorSwordStrike
-    damage: 3
+    value: 3
     cooldown: 20
+    skillType: 0
   - skillName: BasicWarriorSwordHardStrike
-    damage: 8
+    value: 8
     cooldown: 70
+    skillType: 0

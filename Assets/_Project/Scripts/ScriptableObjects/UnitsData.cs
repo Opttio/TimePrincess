@@ -53,10 +53,10 @@ namespace _Project.Scripts.ScriptableObjects
             {
                 for (int i = 0; i < skillData.Length; i++)
                 {
-                    if (skillData[i].damage < 0)
+                    if (skillData[i].value < 0)
                     {
                         Debug.LogWarning($"{name}: skill '{skillData[i].skillName}' damage < 0 — clamped to 0.", this);
-                        skillData[i].damage = Mathf.Max(0, skillData[i].damage);
+                        skillData[i].value = Mathf.Max(0, skillData[i].value);
                     }
                     if (skillData[i].cooldown < 0f)
                     {
@@ -68,13 +68,20 @@ namespace _Project.Scripts.ScriptableObjects
         }
 #endif
     }
+
+    public enum SkillType
+    {
+        Attack,
+        Heal
+    }
     
     [System.Serializable]
     public class SkillData
     {
         public string skillName;
-        public int damage;
+        public int value;
         public float cooldown;
+        public SkillType skillType;
     }
     
     

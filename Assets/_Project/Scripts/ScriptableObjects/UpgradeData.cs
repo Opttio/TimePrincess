@@ -4,11 +4,11 @@ namespace _Project.Scripts.ScriptableObjects
 {
     public enum UpgradeType
     {
-        FirstSkillDamageInPercent,
-        FirstSkillDamageInTerms,
+        FirstSkillValueInPercent,
+        FirstSkillValueInTerms,
         FirstSkillCooldownInPercent,
-        SecondSkillDamageInPercent,
-        SecondSkillDamageInTerms,
+        SecondSkillValueInPercent,
+        SecondSkillValueInTerms,
         SecondSkillCooldownInPercent,
         MaxHealthInPercent,
         MaxHealthInTerms,

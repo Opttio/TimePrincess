@@ -6,10 +6,10 @@ namespace _Project.Scripts.Runtime.RuntimeData
         public int bonusHealth;
         public float bonusArmour;
         
-        public int bonusSkill0Damage;
+        public int bonusSkill0Value;
         public float bonusSkill0CooldownPercent;
         
-        public int bonusSkill1Damage;
+        public int bonusSkill1Value;
         public float bonusSkill1CooldownPercent;
     }
 }
