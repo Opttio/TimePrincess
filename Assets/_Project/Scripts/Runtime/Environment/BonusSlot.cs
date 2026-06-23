@@ -5,16 +5,13 @@ namespace _Project.Scripts.Runtime.Environment
 {
     public class BonusSlot : MonoBehaviour
     {
-        public BonusData CurrentBonus {get; private set;}
+        [SerializeField] private BonusDatabase _database;
+        
+        public BonusDatabase Database => _database;
 
-        public void SetBonus(BonusData bonus)
+        public bool IsEnabled()
         {
-            CurrentBonus = bonus;
-        }
-
-        public void Clear()
-        {
-            CurrentBonus = null;
+            return gameObject.activeSelf && _database != null;
         }
     }
 }

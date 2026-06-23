@@ -7,6 +7,12 @@ namespace _Project.Scripts.Services
     {
         [SerializeField] private CanvasGroup _fadeCanvas;
         [SerializeField] private float _fadeDuration = 1f;
+        private readonly float _startAlpha = 0f;
+
+        private void Start()
+        {
+            _fadeCanvas.alpha = _startAlpha;
+        }
 
         public async UniTask FadeAsync(float targetAlpha)
         {

@@ -1,52 +1,79 @@
 using System.Linq;
 using UnityEngine;
 using _Project.Scripts.ScriptableObjects;
+using _Project.Scripts.UI.Bonuses;
+using Cysharp.Threading.Tasks;
 
 namespace _Project.Scripts.Managers
 {
     public class BonusManager
     {
         private readonly ChronaManager _chronaManager;
-        private readonly BonusDatabase _database;
+        
+        private BonusPanel _bonusPanel;
+        private AllyManager _allyManager;
 
-        public BonusManager(ChronaManager chronaManager, BonusDatabase database)
+        public BonusManager(ChronaManager chronaManager, AllyManager allyManager)
         {
             _chronaManager = chronaManager;
-            _database = database;
+            _allyManager = allyManager;
         }
 
-        public BonusData GetRandomBonus()
+        public void SetPanel(BonusPanel bonusPanel) => _bonusPanel = bonusPanel;
+
+        public async UniTask WaitForPlayerChoice(BonusDatabase database)
         {
-            if (_chronaManager.IsFirstEncounter())
+            BonusData bonus;
+
+            if (!_chronaManager.IsChronaInParty())  //Хрона ще не в паті
             {
-                _chronaManager.RescueChrona();
-                ReturnChrona();
+                bonus = ReturnChrona(database);
+
+                if (_chronaManager.IsFirstEncounter())
+                {
+                    Debug.Log("TODO: діалог першої зустрічі");
+                    _chronaManager.RescueChrona();
+                }
+                else
+                {
+                    Debug.Log("TODO: діалог другої зустрічі");
+                }
             }
-            var availableBonuses = _database.allBonuses.Where(b => b._type != BonusType.NewAlly || 
-                                                                   b.allyPrefab.name != "Chrona").ToArray();
+            else //Хрона вже в паті
+            {
+                bonus = GetRandomBonus(database);
+            }
             
+            if (!bonus) return;
+            
+            var token = new UniTaskCompletionSource();
+            _bonusPanel.Show(bonus, () => token.TrySetResult());
+            await token.Task;
+            if (bonus._type == BonusType.NewAlly)
+                _allyManager.AddAlly(bonus.allyPrefab);
+            //TODO: switch/case якщо NewAlly, якщо Money, якщо SessionBuff
+        }
+
+        private BonusData GetRandomBonus(BonusDatabase database)
+        {
+            var availableBonuses = database.allBonuses.
+                Where(b => b._type != BonusType.NewAlly ||
+                                     _allyManager.HasFreeSlot())
+                .ToArray();
             if (availableBonuses.Length == 0)
             {
-                Debug.LogWarning("База даних бонусів порожня або не містить доступних варіантів!");
+                Debug.LogWarning("Пул бонусів порожній або не відповідає умовам!");
                 return null;
             }
-            
             return availableBonuses[Random.Range(0, availableBonuses.Length)];
         }
 
-        private BonusData ReturnChrona()
+        private BonusData ReturnChrona(BonusDatabase database)
         {
-            BonusData chronaBonus = _database.allBonuses.FirstOrDefault(b => b._type == BonusType.NewAlly &&
-                                                                             b.allyPrefab != null &&
-                                                                             b.allyPrefab.name != "Chrona");
-
-            if (chronaBonus == null)
-            {
-                Debug.LogError("Хрону не знайдено в BonusDatabase. Перевір!");
-            }
-            
-            Debug.Log("Отримав Хрону");
-            return chronaBonus;
+            return database.allBonuses.
+                FirstOrDefault(b => b._type == BonusType.NewAlly && 
+                                              b.allyPrefab != null && 
+                                              b.allyPrefab.name == "Chrona");
         }
     }
 }
