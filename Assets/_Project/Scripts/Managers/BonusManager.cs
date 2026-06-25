@@ -9,16 +9,21 @@ namespace _Project.Scripts.Managers
     public class BonusManager
     {
         private readonly ChronaManager _chronaManager;
+        private readonly DialogueManager _dialogueManager;
+        private readonly EncounterDatabase _encounterDatabase;
         
         private BonusPanel _bonusPanel;
         private AllyManager _allyManager;
         private CurrencyManager _currencyManager;
 
-        public BonusManager(ChronaManager chronaManager, AllyManager allyManager, CurrencyManager currencyManager)
+        public BonusManager(ChronaManager chronaManager, AllyManager allyManager, CurrencyManager currencyManager,
+                            DialogueManager dialogueManager, EncounterDatabase encounterDatabase)
         {
             _chronaManager = chronaManager;
             _allyManager = allyManager;
             _currencyManager = currencyManager;
+            _dialogueManager = dialogueManager;
+            _encounterDatabase = encounterDatabase;
         }
 
         public void SetPanel(BonusPanel bonusPanel) => _bonusPanel = bonusPanel;
@@ -33,12 +38,13 @@ namespace _Project.Scripts.Managers
 
                 if (_chronaManager.IsFirstEncounter())
                 {
-                    Debug.Log("TODO: діалог першої зустрічі");
+                    await _dialogueManager.PlayDialogue(_encounterDatabase.chronaFirstDialogue);
                     _chronaManager.RescueChrona();
                 }
                 else
                 {
                     Debug.Log("TODO: діалог другої зустрічі");
+                    // TODO: await _dialogueManager.PlayDialogue(_encounterDatabase.chronaSecondDialogue);
                 }
             }
             else //Хрона вже в паті
@@ -65,7 +71,10 @@ namespace _Project.Scripts.Managers
                         unit.Heal(bonus.healAmount);
                     break;
                 case BonusType.SessionBuff:
-                    //TODO: Отримати UpgradeData для когось з юнітів
+                    if (bonus.UpgradeData)
+                        _allyManager.ApplyBonusUpgradeToAll(bonus.UpgradeData);
+                    else
+                        Debug.LogWarning("Не підключено або нема SessionBuffData");
                     break;
             }
         }

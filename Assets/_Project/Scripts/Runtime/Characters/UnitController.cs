@@ -39,6 +39,7 @@ namespace _Project.Scripts.Runtime.Characters
         
         public int CurrentHealth => _healthData.currentHealth;
         public int MaxHealth => _healthData.maxHealth;
+        public float CurrentArmor => _healthData.armor;
         public UnitSlot CurrentSlot => _currentSlot;
         public TeamType Team => _team;
 
@@ -94,7 +95,14 @@ namespace _Project.Scripts.Runtime.Characters
         public void ApplyUpgrade(UpgradeData data)
         {
             _statsSystem.ApplyUpgrade(data);
-            Debug.Log($"[{name}] Applied {data.upgradeName}");
+            int newMaxHealth = _statsSystem.GetMaxHealth();
+            int diff = newMaxHealth - _healthData.maxHealth;
+            _healthData.maxHealth = newMaxHealth;
+            _healthData.currentHealth = Mathf.Min(_healthData.currentHealth + diff, newMaxHealth);
+            OnHealthChanged?.Invoke(_healthData.currentHealth, _healthData.maxHealth);
+
+            _healthData.armor = _statsSystem.GetArmor();
+            Debug.Log($"[{name}] Applied {data.upgradeName} | MaxHP: {_healthData.maxHealth} | Armor: {_healthData.armor}");
         }
         
         public void ResetSession() => _statsSystem.ResetSession();

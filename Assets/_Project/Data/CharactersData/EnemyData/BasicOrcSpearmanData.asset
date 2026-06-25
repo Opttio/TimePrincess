@@ -21,7 +21,7 @@ MonoBehaviour:
   clickCooldownReductionPercent: 10
   skillData:
   - skillName: BasicOrcSpearmanStrike
-    value: 1000
+    value: 5
     cooldown: 5
     skillType: 0
   - skillName: BasicOrcSpearmanHardStrike

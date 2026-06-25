@@ -9,12 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 001d6468cbf14df19b108f910251218d, type: 3}
-  m_Name: ArmorInTerms
+  m_Script: {fileID: 11500000, guid: 5a42df397fa34109aa46ab8c886b2c68, type: 3}
+  m_Name: EncounterDatabase
   m_EditorClassIdentifier: 
-  upgradeName: Armor in terms
-  description: Upgrade your armor in absolute terms
-  icon: {fileID: 0}
-  rewardType: 0
-  type: 9
-  value: 3
+  chronaFirstDialogue: {fileID: 11400000, guid: 5470287333bd8b74ebb7b19a3ae22695, type: 2}

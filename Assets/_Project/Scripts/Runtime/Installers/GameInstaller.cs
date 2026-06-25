@@ -35,6 +35,7 @@ namespace _Project.Scripts.Runtime.Installers
             Container.Bind<MetaProgressData>().AsSingle();
             Container.Bind<ChronaManager>().AsSingle();
             Container.Bind<BonusManager>().AsSingle();
+            Container.Bind<DialogueManager>().AsSingle();
             
             Container.Bind<AllyManager>().FromInstance(_allyManager).AsSingle();
             Container.Bind<CameraManager>().FromInstance(_cameraManager).AsSingle();
@@ -48,7 +49,6 @@ namespace _Project.Scripts.Runtime.Installers
             Container.Bind<UnitsDatabase>().FromInstance(_unitsDatabase).AsSingle();
             Container.Bind<UpgradeViewManager>().FromInstance(_upgradeViewManager).AsSingle();
             Container.Bind<CurrencyManager>().FromInstance(_currencyManager).AsSingle();
-            
         }
         
     }

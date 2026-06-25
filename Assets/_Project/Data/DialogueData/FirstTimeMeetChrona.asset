@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 327cc7383dd64e0bba22b28e405dcc38, type: 3}
+  m_Name: FirstTimeMeetChrona
+  m_EditorClassIdentifier: 
+  lines:
+  - speakerName: Stelis
+    speakerSide: 0
+    text: How are you?
+    icon: {fileID: 21300000, guid: bc544f773d5d942478130b3241840067, type: 3}
+  - speakerName: Chrona
+    speakerSide: 1
+    text: I am ok, thanks.
+    icon: {fileID: 21300000, guid: 5db25b90adf39074380774a07df5057c, type: 3}
+  - speakerName: Stelis
+    speakerSide: 0
+    text: What`s your name?
+    icon: {fileID: 21300000, guid: bc544f773d5d942478130b3241840067, type: 3}
+  - speakerName: Chrona
+    speakerSide: 1
+    text: I am Chrona. I am princess from Lalalala. Please help me come back.
+    icon: {fileID: 21300000, guid: 5db25b90adf39074380774a07df5057c, type: 3}
+  - speakerName: Stelis
+    speakerSide: 0
+    text: "I don\u2019t know of any such place in these parts, even though I grew
+      up here."
+    icon: {fileID: 21300000, guid: bc544f773d5d942478130b3241840067, type: 3}
+  - speakerName: Chrona
+    speakerSide: 1
+    text: "This place isn\u2019t of this world. It\u2019s hard to explain, but in
+      my world, someone tried to kidnap me, so I used the teleportation stone and
+      ended up here. But unfortunately, I was captured, and a huge orc took the stone;
+      I need to get it back so that I can return to my world and try to save my father."
+    icon: {fileID: 21300000, guid: 5db25b90adf39074380774a07df5057c, type: 3}
+  - speakerName: Stelis
+    speakerSide: 0
+    text: "It sounds a bit far-fetched, but I can\u2019t just leave a woman in distress
+      \u2014 show me this orc, and I, Prince Stelis the Radiant, shall demonstrate
+      to him the power of my sword!"
+    icon: {fileID: 21300000, guid: bc544f773d5d942478130b3241840067, type: 3}

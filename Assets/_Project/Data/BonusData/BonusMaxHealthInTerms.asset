@@ -17,4 +17,5 @@ MonoBehaviour:
   icon: {fileID: 0}
   allyPrefab: {fileID: 0}
   amount: 0
-  UpgradeData: {fileID: 11400000, guid: 2aa6bb090307a2a47bf43c96027d1e80, type: 2}
+  UpgradeData: {fileID: 11400000, guid: bc986e70162b9e741832a3ec5f1d2523, type: 2}
+  healAmount: 2

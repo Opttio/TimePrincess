@@ -206,6 +206,12 @@ namespace _Project.Scripts.Managers
                 unit.ResetSession();
         }
 
+        public void ApplyBonusUpgradeToAll(UpgradeData bonusUpgradeData)
+        {
+            foreach (var unit in _alliesInstances)
+                unit.ApplyUpgrade(bonusUpgradeData);
+        }
+
         public void AddAlly(UnitController prefab)
         {
             var instance = _container.InstantiatePrefabForComponent<UnitController>(prefab.gameObject, _allyInstancesBox);
